@@ -380,6 +380,36 @@ message AuthenticationPolicy {
     // request's headers need to be verified and processed in a custom way to
     // produce buildbarn.auth.AuthenticationMetadata.
     RemoteAuthenticationPolicy remote = 8;
+
+    // Allow incoming requests unconditionally, deriving
+    // buildbarn.auth.AuthenticationMetadata from the incoming gRPC
+    // request metadata via the given JMESPath expression. The
+    // expression is evaluated against:
+    //
+    //     {
+    //       "incomingGRPCMetadata": map<string, repeated string>
+    //     }
+    //
+    // The result is interpreted as buildbarn.auth.AuthenticationMetadata
+    // in JSON form — the same conversion path that
+    // jwt.metadata_extraction_jmespath_expression and
+    // peer_credentials_jmespath_expression use.
+    //
+    // This is useful when a deployment terminates authentication at an
+    // upstream proxy (for example bb_frontend doing JWT validation)
+    // and forwards arbitrary metadata to downstream services as gRPC
+    // headers, and those downstream services need to reconstitute
+    // AuthenticationMetadata to drive per-request authorization,
+    // outbound credential propagation via
+    // add_metadata_jmespath_expression on outbound gRPC clients, or
+    // other auth-context-aware behavior.
+    //
+    // The following expression can be used if no metadata needs to be
+    // extracted from the headers (including the backticks):
+    //
+    //     `{}`
+    buildbarn.configuration.jmespath.Expression
+        incoming_headers_jmespath_expression = 9;
   }
 }
 
