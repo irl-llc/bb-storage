@@ -533,6 +533,7 @@ type AuthenticationPolicy struct {
 	//	*AuthenticationPolicy_Jwt
 	//	*AuthenticationPolicy_PeerCredentialsJmespathExpression
 	//	*AuthenticationPolicy_Remote
+	//	*AuthenticationPolicy_IncomingHeadersJmespathExpression
 	Policy        isAuthenticationPolicy_Policy `protobuf_oneof:"policy"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -647,6 +648,15 @@ func (x *AuthenticationPolicy) GetRemote() *RemoteAuthenticationPolicy {
 	return nil
 }
 
+func (x *AuthenticationPolicy) GetIncomingHeadersJmespathExpression() *jmespath.Expression {
+	if x != nil {
+		if x, ok := x.Policy.(*AuthenticationPolicy_IncomingHeadersJmespathExpression); ok {
+			return x.IncomingHeadersJmespathExpression
+		}
+	}
+	return nil
+}
+
 type isAuthenticationPolicy_Policy interface {
 	isAuthenticationPolicy_Policy()
 }
@@ -683,6 +693,10 @@ type AuthenticationPolicy_Remote struct {
 	Remote *RemoteAuthenticationPolicy `protobuf:"bytes,8,opt,name=remote,proto3,oneof"`
 }
 
+type AuthenticationPolicy_IncomingHeadersJmespathExpression struct {
+	IncomingHeadersJmespathExpression *jmespath.Expression `protobuf:"bytes,9,opt,name=incoming_headers_jmespath_expression,json=incomingHeadersJmespathExpression,proto3,oneof"`
+}
+
 func (*AuthenticationPolicy_Allow) isAuthenticationPolicy_Policy() {}
 
 func (*AuthenticationPolicy_Any) isAuthenticationPolicy_Policy() {}
@@ -698,6 +712,8 @@ func (*AuthenticationPolicy_Jwt) isAuthenticationPolicy_Policy() {}
 func (*AuthenticationPolicy_PeerCredentialsJmespathExpression) isAuthenticationPolicy_Policy() {}
 
 func (*AuthenticationPolicy_Remote) isAuthenticationPolicy_Policy() {}
+
+func (*AuthenticationPolicy_IncomingHeadersJmespathExpression) isAuthenticationPolicy_Policy() {}
 
 type AnyAuthenticationPolicy struct {
 	state         protoimpl.MessageState  `protogen:"open.v1"`
@@ -1135,7 +1151,7 @@ const file_github_com_buildbarn_bb_storage_pkg_proto_configuration_grpc_grpc_pro
 	"\x12max_connection_age\x18\x02 \x01(\v2\x19.google.protobuf.DurationR\x10maxConnectionAge\x12R\n" +
 	"\x18max_connection_age_grace\x18\x03 \x01(\v2\x19.google.protobuf.DurationR\x15maxConnectionAgeGrace\x12-\n" +
 	"\x04time\x18\x04 \x01(\v2\x19.google.protobuf.DurationR\x04time\x123\n" +
-	"\atimeout\x18\x05 \x01(\v2\x19.google.protobuf.DurationR\atimeout\"\xb8\x05\n" +
+	"\atimeout\x18\x05 \x01(\v2\x19.google.protobuf.DurationR\atimeout\"\xb9\x06\n" +
 	"\x14AuthenticationPolicy\x12>\n" +
 	"\x05allow\x18\x01 \x01(\v2&.buildbarn.auth.AuthenticationMetadataH\x00R\x05allow\x12I\n" +
 	"\x03any\x18\x02 \x01(\v25.buildbarn.configuration.grpc.AnyAuthenticationPolicyH\x00R\x03any\x12I\n" +
@@ -1144,7 +1160,8 @@ const file_github_com_buildbarn_bb_storage_pkg_proto_configuration_grpc_grpc_pro
 	"\x16tls_client_certificate\x18\x04 \x01(\v2D.buildbarn.configuration.x509.ClientCertificateVerifierConfigurationH\x00R\x14tlsClientCertificate\x12W\n" +
 	"\x03jwt\x18\x05 \x01(\v2C.buildbarn.configuration.jwt.AuthorizationHeaderParserConfigurationH\x00R\x03jwt\x12\x7f\n" +
 	"$peer_credentials_jmespath_expression\x18\x06 \x01(\v2,.buildbarn.configuration.jmespath.ExpressionH\x00R!peerCredentialsJmespathExpression\x12R\n" +
-	"\x06remote\x18\b \x01(\v28.buildbarn.configuration.grpc.RemoteAuthenticationPolicyH\x00R\x06remoteB\b\n" +
+	"\x06remote\x18\b \x01(\v28.buildbarn.configuration.grpc.RemoteAuthenticationPolicyH\x00R\x06remote\x12\x7f\n" +
+	"$incoming_headers_jmespath_expression\x18\t \x01(\v2,.buildbarn.configuration.jmespath.ExpressionH\x00R!incomingHeadersJmespathExpressionB\b\n" +
 	"\x06policy\"i\n" +
 	"\x17AnyAuthenticationPolicy\x12N\n" +
 	"\bpolicies\x18\x01 \x03(\v22.buildbarn.configuration.grpc.AuthenticationPolicyR\bpolicies\"i\n" +
@@ -1239,21 +1256,22 @@ var file_github_com_buildbarn_bb_storage_pkg_proto_configuration_grpc_grpc_proto
 	24, // 26: buildbarn.configuration.grpc.AuthenticationPolicy.jwt:type_name -> buildbarn.configuration.jwt.AuthorizationHeaderParserConfiguration
 	16, // 27: buildbarn.configuration.grpc.AuthenticationPolicy.peer_credentials_jmespath_expression:type_name -> buildbarn.configuration.jmespath.Expression
 	9,  // 28: buildbarn.configuration.grpc.AuthenticationPolicy.remote:type_name -> buildbarn.configuration.grpc.RemoteAuthenticationPolicy
-	5,  // 29: buildbarn.configuration.grpc.AnyAuthenticationPolicy.policies:type_name -> buildbarn.configuration.grpc.AuthenticationPolicy
-	5,  // 30: buildbarn.configuration.grpc.AllAuthenticationPolicy.policies:type_name -> buildbarn.configuration.grpc.AuthenticationPolicy
-	16, // 31: buildbarn.configuration.grpc.TLSClientCertificateAuthenticationPolicy.validation_jmespath_expression:type_name -> buildbarn.configuration.jmespath.Expression
-	16, // 32: buildbarn.configuration.grpc.TLSClientCertificateAuthenticationPolicy.metadata_extraction_jmespath_expression:type_name -> buildbarn.configuration.jmespath.Expression
-	0,  // 33: buildbarn.configuration.grpc.RemoteAuthenticationPolicy.endpoint:type_name -> buildbarn.configuration.grpc.ClientConfiguration
-	25, // 34: buildbarn.configuration.grpc.RemoteAuthenticationPolicy.scope:type_name -> google.protobuf.Value
-	26, // 35: buildbarn.configuration.grpc.RemoteAuthenticationPolicy.cache_replacement_policy:type_name -> buildbarn.configuration.eviction.CacheReplacementPolicy
-	0,  // 36: buildbarn.configuration.grpc.ServerRelayConfiguration.endpoint:type_name -> buildbarn.configuration.grpc.ClientConfiguration
-	10, // 37: buildbarn.configuration.grpc.ClientConfiguration.TracingEntry.value:type_name -> buildbarn.configuration.grpc.TracingMethodConfiguration
-	10, // 38: buildbarn.configuration.grpc.ServerConfiguration.TracingEntry.value:type_name -> buildbarn.configuration.grpc.TracingMethodConfiguration
-	39, // [39:39] is the sub-list for method output_type
-	39, // [39:39] is the sub-list for method input_type
-	39, // [39:39] is the sub-list for extension type_name
-	39, // [39:39] is the sub-list for extension extendee
-	0,  // [0:39] is the sub-list for field type_name
+	16, // 29: buildbarn.configuration.grpc.AuthenticationPolicy.incoming_headers_jmespath_expression:type_name -> buildbarn.configuration.jmespath.Expression
+	5,  // 30: buildbarn.configuration.grpc.AnyAuthenticationPolicy.policies:type_name -> buildbarn.configuration.grpc.AuthenticationPolicy
+	5,  // 31: buildbarn.configuration.grpc.AllAuthenticationPolicy.policies:type_name -> buildbarn.configuration.grpc.AuthenticationPolicy
+	16, // 32: buildbarn.configuration.grpc.TLSClientCertificateAuthenticationPolicy.validation_jmespath_expression:type_name -> buildbarn.configuration.jmespath.Expression
+	16, // 33: buildbarn.configuration.grpc.TLSClientCertificateAuthenticationPolicy.metadata_extraction_jmespath_expression:type_name -> buildbarn.configuration.jmespath.Expression
+	0,  // 34: buildbarn.configuration.grpc.RemoteAuthenticationPolicy.endpoint:type_name -> buildbarn.configuration.grpc.ClientConfiguration
+	25, // 35: buildbarn.configuration.grpc.RemoteAuthenticationPolicy.scope:type_name -> google.protobuf.Value
+	26, // 36: buildbarn.configuration.grpc.RemoteAuthenticationPolicy.cache_replacement_policy:type_name -> buildbarn.configuration.eviction.CacheReplacementPolicy
+	0,  // 37: buildbarn.configuration.grpc.ServerRelayConfiguration.endpoint:type_name -> buildbarn.configuration.grpc.ClientConfiguration
+	10, // 38: buildbarn.configuration.grpc.ClientConfiguration.TracingEntry.value:type_name -> buildbarn.configuration.grpc.TracingMethodConfiguration
+	10, // 39: buildbarn.configuration.grpc.ServerConfiguration.TracingEntry.value:type_name -> buildbarn.configuration.grpc.TracingMethodConfiguration
+	40, // [40:40] is the sub-list for method output_type
+	40, // [40:40] is the sub-list for method input_type
+	40, // [40:40] is the sub-list for extension type_name
+	40, // [40:40] is the sub-list for extension extendee
+	0,  // [0:40] is the sub-list for field type_name
 }
 
 func init() { file_github_com_buildbarn_bb_storage_pkg_proto_configuration_grpc_grpc_proto_init() }
@@ -1274,6 +1292,7 @@ func file_github_com_buildbarn_bb_storage_pkg_proto_configuration_grpc_grpc_prot
 		(*AuthenticationPolicy_Jwt)(nil),
 		(*AuthenticationPolicy_PeerCredentialsJmespathExpression)(nil),
 		(*AuthenticationPolicy_Remote)(nil),
+		(*AuthenticationPolicy_IncomingHeadersJmespathExpression)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
