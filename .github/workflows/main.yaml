@@ -566,39 +566,6 @@
                   "name": "sync_jwks_to_configmap.windows_amd64",
                   "path": "sync_jwks_to_configmap.windows_amd64.exe"
                }
-            },
-            {
-               "env": {
-                  "GITHUB_TOKEN": "${{ secrets.GITHUB_TOKEN }}"
-               },
-               "if": "matrix.host.upload",
-               "name": "Install Docker credentials",
-               "run": "echo \"${GITHUB_TOKEN}\" | docker login ghcr.io -u $ --password-stdin"
-            },
-            {
-               "if": "matrix.host.upload",
-               "name": "Clean Bazel cache from previous steps",
-               "run": "bazel clean"
-            },
-            {
-               "if": "matrix.host.upload",
-               "name": "Push container bb_copy:bb_copy",
-               "run": "bazel run --stamp //cmd/bb_copy:bb_copy_container_push"
-            },
-            {
-               "if": "matrix.host.upload",
-               "name": "Push container bb_replicator:bb_replicator",
-               "run": "bazel run --stamp //cmd/bb_replicator:bb_replicator_container_push"
-            },
-            {
-               "if": "matrix.host.upload",
-               "name": "Push container bb_storage:bb_storage",
-               "run": "bazel run --stamp //cmd/bb_storage:bb_storage_container_push"
-            },
-            {
-               "if": "matrix.host.upload",
-               "name": "Push container sync_jwks_to_configmap:sync_jwks_to_configmap",
-               "run": "bazel run --stamp //cmd/sync_jwks_to_configmap:sync_jwks_to_configmap_container_push"
             }
          ],
          "strategy": {
@@ -655,6 +622,9 @@
             "build_and_test"
          ],
          "runs-on": "ubuntu-latest",
+         "permissions": {
+            "contents": "write"
+         },
          "steps": [
             {
                "name": "Checkout the repository",
@@ -673,21 +643,12 @@
                "run": "shasum -a 256 assets/* > sha256"
             },
             {
-               "name": "Set release Git user",
-               "run": "git config --global user.email \"41898282+github-actions[bot]@users.noreply.github.com\"\ngit config --global user.name \"github-actions[bot]\"\n"
-            },
-            {
-               "id": "create_tag",
-               "name": "Generate tag",
-               "run": "BUILD_SCM_REVISION=$(git rev-parse --short HEAD)\nBUILD_SCM_TIMESTAMP=$(TZ=UTC date --date \"@$(git show -s --format=%ct HEAD)\" +%Y%m%dT%H%M%SZ)\nRELEASE_TAG=\"${BUILD_SCM_TIMESTAMP}-${BUILD_SCM_REVISION}\"\ngit tag $RELEASE_TAG\ngit push --follow-tags\necho \"release_tag=$RELEASE_TAG\" >> $GITHUB_OUTPUT\n"
-            },
-            {
                "name": "Create GitHub release and upload artifacts",
                "uses": "softprops/action-gh-release@v2",
                "with": {
                   "files": "assets/*\nsha256\n",
                   "make_latest": true,
-                  "tag_name": "${{ steps.create_tag.outputs.release_tag }}"
+                  "tag_name": "${{ github.ref_name }}"
                }
             }
          ]
@@ -698,7 +659,11 @@
       "push": {
          "branches": [
             "main"
+         ],
+         "tags": [
+            "*\\+irl*"
          ]
-      }
+      },
+      "workflow_dispatch": {}
    }
 }

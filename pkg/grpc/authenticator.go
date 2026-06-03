@@ -85,6 +85,12 @@ func NewAuthenticatorFromConfiguration(policy *configuration.AuthenticationPolic
 			return nil, false, false, util.StatusWrap(err, "Failed to compile peer credentials metadata extraction JMESPath expression")
 		}
 		return NewPeerCredentialsAuthenticator(metadataExtractor), true, false, nil
+	case *configuration.AuthenticationPolicy_IncomingHeadersJmespathExpression:
+		metadataExtractor, err := jmespath.NewExpressionFromConfiguration(policyKind.IncomingHeadersJmespathExpression, group, clock.SystemClock)
+		if err != nil {
+			return nil, false, false, util.StatusWrap(err, "Failed to compile incoming-headers metadata extraction JMESPath expression")
+		}
+		return NewIncomingHeadersAuthenticator(metadataExtractor), false, false, nil
 	case *configuration.AuthenticationPolicy_Remote:
 		// TODO: With auth.RequestHeadersPolicy = oneof {auth.Jwt, auth.Remote}
 		// in the .proto definitions, the HTTP and gRPC authentication policy
